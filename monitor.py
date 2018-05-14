@@ -6,6 +6,8 @@ import json
 import os
 import redis
 from datadog import initialize, statsd
+from datetime import datetime
+
 
 PRIORITY_SEP = '\x06\x16'
 
@@ -78,8 +80,13 @@ def redis_connect(args):
 
 
 def make_queue_name_for_pri(queue, pri):
+    # https://stackoverflow.com/questions/5544629/retrieve-list-of-tasks-in-a-queue-in-celery?lq=1
     return '{0}{1}{2}'.format(*((queue, PRIORITY_SEP, pri) if pri else
                                 (queue, '', '')))
+
+def make_queue_name_for_pri_without_sep(queue, pri):
+    return '{0}{1}'.format(*((queue, pri) if pri else
+                                (queue, '')))
 
 
 def datadog_init(args):
@@ -91,14 +98,17 @@ def datadog_init(args):
 
 
 def get_stat(args, redis):
-    # https://stackoverflow.com/questions/5544629/retrieve-list-of-tasks-in-a-queue-in-celery?lq=1
-    priority_names = [make_queue_name_for_pri(args.celery_queue, pri) for pri in
-                      str(args.priority_steps).split(',')]
-
     stat = {}
-    for queue in priority_names:
+    total_size = 0
+    for prio in str(args.priority_steps).split(','):
+        queue = make_queue_name_for_pri(args.celery_queue, prio)
+        queue_name = make_queue_name_for_pri_without_sep(args.celery_queue, prio)
         # size of queue
         qlen = redis.llen(queue)
+        total_size += qlen
+        print('queue {0} size ->{1}'.format(queue_name, qlen))
+        metric = '{0}{1}.size'.format(args.dd_metric_prefix, queue_name)
+        statsd.gauge(metric, qlen)
         # number of chunks to get
         chunk_n = (qlen + args.chunk_size - 1) // args.chunk_size
         for chunk in range(0, chunk_n):
@@ -115,9 +125,13 @@ def get_stat(args, redis):
         metric = '{0}{1}'.format(args.dd_metric_prefix, task)
         print('{0}->{1}'.format(task, count))
         statsd.gauge(metric, count)
+    print('total size -> {0}'.format(total_size))
+    metric = '{0}total.size'.format(args.dd_metric_prefix)
+    statsd.gauge(metric, total_size)
 
 
 def main():
+    print(str(datetime.now()))
     args = get_args()
     datadog_init(args)
     redis = redis_connect(args)

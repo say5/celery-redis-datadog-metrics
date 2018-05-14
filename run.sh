@@ -1,6 +1,7 @@
 #!/bin/bash
 
-while /bin/true do
+while /bin/true
+do
   ./monitor.py \
     --redis-host ${REDIS_HOST} \
     --redis-port ${REDIS_PORT:-6379} \
@@ -12,5 +13,5 @@ while /bin/true do
     --dd-statsd-host ${STATSD_HOST:-localhost} \
     --dd-statsd-port ${STATSD_PORT:-8125} \
     --dd-metric-prefix ${DD_METRIC_PREFIX:-celery.}
-  sleep(${SLEEP:-600})
+  sleep ${SLEEP:-600}
 done
