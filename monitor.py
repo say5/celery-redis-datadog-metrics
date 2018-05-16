@@ -18,7 +18,7 @@ def get_args():
                                      formatter_class=formatter_class)
     parser.add_argument('--redis-host',
                         type=str,
-                        required=True,
+                        default='127.0.0.1',
                         help='Redis hostname',
                         dest='redis_host')
     parser.add_argument('--redis-port',
@@ -48,12 +48,12 @@ def get_args():
                         dest='chunk_size')
     parser.add_argument('--celery-queue',
                         type=str,
-                        required=True,
+                        default='celery',
                         help='Celery queue name',
                         dest='celery_queue')
     parser.add_argument('--dd-statsd-host',
                         type=str,
-                        required=True,
+                        default='127.0.0.1',
                         help='DD statsd hostname',
                         dest='dd_statsd_host')
     parser.add_argument('--dd-statsd-port',
@@ -63,7 +63,7 @@ def get_args():
                         dest='dd_statsd_port')
     parser.add_argument('--dd-metric-prefix',
                         type=str,
-                        required=True,
+                        default='celery.redis.',
                         help='DD metric prefix',
                         dest='dd_metric_prefix')
     return parser.parse_args()
