@@ -81,11 +81,11 @@ def redis_connect(args):
 
 def make_queue_name_for_pri(queue, pri):
     # https://stackoverflow.com/questions/5544629/retrieve-list-of-tasks-in-a-queue-in-celery?lq=1
-    return '{0}{1}{2}'.format(*((queue, PRIORITY_SEP, pri) if pri else
+    return '{0}{1}{2}'.format(*((queue, PRIORITY_SEP, pri) if int(pri) != 0 else
                                 (queue, '', '')))
 
 def make_queue_name_for_pri_without_sep(queue, pri):
-    return '{0}{1}'.format(*((queue, pri) if pri else
+    return '{0}{1}'.format(*((queue, pri) if int(pri) != 0 else
                                 (queue, '')))
 
 
