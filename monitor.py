@@ -66,6 +66,10 @@ def get_args():
                         default='celery.redis.',
                         help='DD metric prefix',
                         dest='dd_metric_prefix')
+    parser.add_argument('--ssl',
+                        action='store_true',
+                        help='Redis SSL connection',
+                        dest='ssl')
     return parser.parse_args()
 
 
@@ -74,7 +78,8 @@ def redis_connect(args):
       host=args.redis_host,
       port=args.redis_port,
       password=args.redis_pass,
-      db=args.redis_db
+      db=args.redis_db,
+      ssl=args.ssl,
     )
     return connection
 

@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ -n "$REDIS_SSL" ]; then
+  SSL='--ssl'
+fi
+
 while /bin/true
 do
   ./monitor.py \
@@ -12,6 +16,6 @@ do
     --celery-queue ${CELERY_QUEUE:-celery} \
     --dd-statsd-host ${STATSD_HOST:-localhost} \
     --dd-statsd-port ${STATSD_PORT:-8125} \
-    --dd-metric-prefix ${DD_METRIC_PREFIX:-celery.}
+    --dd-metric-prefix ${DD_METRIC_PREFIX:-celery.} ${SSL:-''}
   sleep ${SLEEP:-600}
 done
