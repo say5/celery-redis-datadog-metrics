@@ -98,6 +98,7 @@ def datadog_init(args):
     options = {
         'statsd_host': args.dd_statsd_host,
         'statsd_port': args.dd_statsd_port,
+        'host_name': '',
     }
     initialize(**options)
 
